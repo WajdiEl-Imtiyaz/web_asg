@@ -1,12 +1,10 @@
 <?php
 session_start();
 if(empty($_SESSION['user']) || empty($_SESSION['is_admin'])){
-    // not logged in or not admin -> redirect to login
     header("Location: ../login/login.php");
     exit();
 }
 
-// Handle logout
 if(isset($_GET['logout'])){
     session_destroy();
     header("Location: ../login/login.php");

@@ -2,24 +2,20 @@
 session_start();
 require '../db.php';
 if(empty($_SESSION['user']) || empty($_SESSION['is_admin'])){
-    // not logged in or not admin -> redirect to login
     header("Location: ../login/login.php");
     exit();
 }
 
-// Handle logout
 if(isset($_GET['logout'])){
     session_destroy();
     header("Location: ../login/login.php");
     exit();
 }
 
-// Handle ban/unban actions
 if (isset($_GET['action']) && isset($_GET['id'])) {
     $user_id = intval($_GET['id']);
     $action = $_GET['action'];
     
-    // Prevent modifying the main admin (user ID 1)
     if ($user_id == 1) {
         $_SESSION['error'] = "Cannot modify the main administrator.";
         header("Location: manage_users.php");
@@ -51,7 +47,6 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
     exit();
 }
 
-// Fetch users from database with profile information
 $sql = "SELECT u.uId, u.uEmail, u.is_admin, u.is_banned, u.created_at,
                COALESCE(up.name, u.uEmail) as display_name 
         FROM users u 
@@ -60,7 +55,6 @@ $sql = "SELECT u.uId, u.uEmail, u.is_admin, u.is_banned, u.created_at,
 $result = mysqli_query($conn, $sql);
 $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
-// Count users by status
 $active_count = 0;
 $banned_count = 0;
 $admin_count = 0;
@@ -116,7 +110,6 @@ foreach ($users as $user) {
   <main>
     <h1>Manage Users</h1>
     
-    <!-- Display success/error messages -->
     <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
     <?php endif; ?>
@@ -128,7 +121,6 @@ foreach ($users as $user) {
     <div class="card">
         <h3>All Users (<?php echo count($users); ?> total)</h3>
         
-        <!-- Status Summary -->
         <div class="status-filter">
             <span class="status-active" style="margin-right: 15px;">
                 Active: <?php echo $active_count; ?>
@@ -180,7 +172,7 @@ foreach ($users as $user) {
                     </td>
                     <td><?php echo date('M j, Y g:i A', strtotime($user['created_at'])); ?></td>
                     <td>
-                        <?php if ($user['uId'] != 1): // Don't allow banning the main admin ?>
+                        <?php if ($user['uId'] != 1): ?>
                             <?php if ($user['is_banned']): ?>
                                 <button class="unban-btn" onclick="confirmUnban(<?php echo $user['uId']; ?>)">Unban</button>
                             <?php else: ?>

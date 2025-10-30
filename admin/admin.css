@@ -9,7 +9,6 @@ Color Palette:
 #4CA9C2 - Light blue (accent color, hover states)
 */
 
-/* Reset and Base Styles */
 * {
   box-sizing: border-box;
 }
@@ -29,13 +28,11 @@ body {
   min-height: 100vh;
 }
 
-/* Layout Container */
 .app.container {
   display: flex;
   min-height: 100vh;
 }
 
-/* Sidebar Styles */
 .sidebar {
   width: 220px;
   position: fixed;
@@ -57,7 +54,6 @@ body {
   font-size: 1.2rem;
 }
 
-/* Menu Styles */
 .menu {
   margin-top: 8px;
   flex: 1;
@@ -89,11 +85,9 @@ body {
   transform: translateX(5px);
 }
 
-/* Logout Section - Updated */
 .logout-section {
   margin-top: auto;
-  padding-top: 0; /* Remove top padding */
-  /* Remove border-top: 1px solid #2d6b67; */
+  padding-top: 0;
 }
 
 .logout-btn {
@@ -121,7 +115,6 @@ body {
   box-shadow: 0 0 10px rgba(76, 169, 194, 0.2);
 }
 
-/* Main Content Area */
 main {
   flex: 1;
   margin-left: 220px;
@@ -135,7 +128,6 @@ main h1 {
   color: #e8e9ed;
 }
 
-/* Stats Grid */
 .stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -167,7 +159,6 @@ main h1 {
   color: #ffffff;
 }
 
-/* Card Styling */
 .card {
   background: #1c2433;
   padding: 20px;
@@ -181,7 +172,6 @@ main h1 {
   color: #4ca9c2;
 }
 
-/* Table Styling */
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -205,7 +195,6 @@ main h1 {
   background: rgba(45, 107, 103, 0.1);
 }
 
-/* Button Styling */
 button {
   background: #f57c00;
   color: white;
@@ -223,7 +212,6 @@ button:hover {
   transform: translateY(-1px);
 }
 
-/* Status Badges */
 .status-active {
   color: #4ca9c2;
   background: rgba(76, 169, 194, 0.1);
@@ -242,7 +230,6 @@ button:hover {
   font-weight: 500;
 }
 
-/* Role Badges */
 .role-admin {
   color: #f57c00;
   background: rgba(245, 124, 0, 0.1);
@@ -261,7 +248,6 @@ button:hover {
   font-weight: 500;
 }
 
-/* Action Buttons */
 .ban-btn {
   background: #dc3545;
   color: white;
@@ -313,7 +299,6 @@ button:hover {
   transform: translateY(-1px);
 }
 
-/* Alert Messages */
 .alert {
   padding: 12px 16px;
   border-radius: 6px;
@@ -333,7 +318,6 @@ button:hover {
   border-color: #dc3545;
 }
 
-/* Form Styles */
 input[type="email"],
 input[type="password"],
 input[type="text"],
@@ -361,7 +345,6 @@ textarea:focus {
   box-shadow: 0 0 5px rgba(76, 169, 194, 0.3);
 }
 
-/* Mobile Responsiveness */
 @media (max-width: 768px) {
   .sidebar {
     width: 100%;
@@ -399,7 +382,6 @@ textarea:focus {
   }
 }
 
-/* Utility Classes */
 .text-center {
   text-align: center;
 }
@@ -418,112 +400,4 @@ textarea:focus {
 
 .hidden {
   display: none;
-}
-/* View Toggle Tab Styles - Modified */
-.view-toggle {
-  margin-bottom: 30px;
-  display: inline-flex;
-  gap: 0;
-  border-radius: 8px;
-  background: #1c2433;
-  border: 1px solid #2d6b67;
-  padding: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.view-toggle a {
-  padding: 12px 24px;
-  background: transparent;
-  border: none;
-  border-radius: 6px;
-  text-decoration: none;
-  color: #b2b5be;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  position: relative;
-}
-
-.view-toggle a:hover {
-  background: rgba(76, 169, 194, 0.1);
-  color: #4ca9c2;
-  transform: translateY(-1px);
-}
-
-.view-toggle a.active {
-  background: #4ca9c2;
-  color: #ffffff;
-  box-shadow: 0 2px 8px rgba(76, 169, 194, 0.3);
-  font-weight: 600;
-}
-
-.view-toggle a.active:hover {
-  background: #3a8ca3;
-  transform: translateY(-1px);
-}
-
-/* Alternative: Border bottom style */
-.view-toggle.line-style {
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid #2d6b67;
-  border-radius: 0;
-  padding: 0;
-  box-shadow: none;
-}
-
-.view-toggle.line-style a {
-  border-radius: 6px 6px 0 0;
-  margin-bottom: -2px;
-  border: 1px solid transparent;
-  border-bottom: none;
-}
-
-.view-toggle.line-style a.active {
-  background: rgba(76, 169, 194, 0.1);
-  color: #4ca9c2;
-  border-color: #4ca9c2;
-  box-shadow: none;
-  border-bottom: 2px solid #4ca9c2;
-}
-
-.view-toggle.line-style a.active:hover {
-  background: rgba(76, 169, 194, 0.2);
-}
-
-/* Alternative: Minimal style */
-.view-toggle.minimal-style {
-  background: transparent;
-  border: 1px solid #2d6b67;
-  border-radius: 8px;
-  padding: 2px;
-}
-
-.view-toggle.minimal-style a.active {
-  background: rgba(76, 169, 194, 0.15);
-  color: #4ca9c2;
-  box-shadow: none;
-}
-
-/* Mobile responsiveness for tabs */
-@media (max-width: 768px) {
-  .view-toggle {
-    flex-direction: column;
-    gap: 4px;
-    padding: 8px;
-  }
-
-  .view-toggle a {
-    text-align: center;
-    border-radius: 6px;
-  }
-
-  .view-toggle.line-style {
-    flex-direction: row;
-    overflow-x: auto;
-  }
-
-  .view-toggle.line-style a {
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
 }

@@ -65,7 +65,6 @@
         }
     }
 
-    // Modified query to exclude posts that admins have archived
     $posts_query = "SELECT p.postID, p.uID, p.content, p.image, p.createdAt, p.is_archived, up.name, up.avatar 
                    FROM posts p 
                    LEFT JOIN user_profile up ON p.uID = up.uID 

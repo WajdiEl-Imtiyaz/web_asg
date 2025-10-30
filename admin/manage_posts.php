@@ -3,19 +3,16 @@ session_start();
 require '../db.php';
 
 if(empty($_SESSION['user']) || empty($_SESSION['is_admin'])){
-    // not logged in or not admin -> redirect to login
     header("Location: ../login/login.php");
     exit();
 }
 
-// Handle logout
 if(isset($_GET['logout'])){
     session_destroy();
     header("Location: ../login/login.php");
     exit();
 }
 
-// Handle post archiving/unarchiving
 if(isset($_GET['action']) && isset($_GET['id'])) {
     $post_id = intval($_GET['id']);
     $action = $_GET['action'];
@@ -49,7 +46,6 @@ if(isset($_GET['action']) && isset($_GET['id'])) {
     }
 }
 
-// Fetch ALL posts from database with user information (both active and archived)
 $sql = "SELECT p.postID, p.content, p.image, p.createdAt, p.is_archived,
                u.uEmail, u.uId,
                COALESCE(up.name, u.uEmail) as display_name 
@@ -60,7 +56,6 @@ $sql = "SELECT p.postID, p.content, p.image, p.createdAt, p.is_archived,
 $result = mysqli_query($conn, $sql);
 $posts = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
-// Count posts by status
 $active_count = 0;
 $archived_count = 0;
 foreach ($posts as $post) {
@@ -112,7 +107,6 @@ foreach ($posts as $post) {
   <main>
     <h1>Manage Posts</h1>
     
-    <!-- Display success/error messages -->
     <?php if (isset($_SESSION['success'])): ?>
         <div class="alert alert-success"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
     <?php endif; ?>
@@ -124,7 +118,6 @@ foreach ($posts as $post) {
     <div class="card">
         <h3>All Posts (<?php echo count($posts); ?> total)</h3>
         
-        <!-- Status Summary -->
         <div class="status-filter">
             <span class="status-active" style="margin-right: 15px;">
                 Active: <?php echo $active_count; ?>
@@ -153,7 +146,6 @@ foreach ($posts as $post) {
                     <td style="max-width: 300px; word-wrap: break-word;">
                         <?php 
                         $content = htmlspecialchars($post['content']);
-                        // Truncate long content
                         if(strlen($content) > 100) {
                             echo substr($content, 0, 100) . '...';
                         } else {
