@@ -17,7 +17,14 @@
             if($row = mysqli_fetch_assoc($result)){
                 if($password === $row['uPassword']) {
                     $_SESSION['user'] = $row['uEmail'];
-                    header("Location: index.php");
+                    $_SESSION['is_admin'] = (bool)$row['is_admin']; // Set admin status in session
+                    
+                    // Redirect based on admin status
+                    if($_SESSION['is_admin']){
+                        header("Location: ../admin/dashboard.php");
+                    } else {
+                        header("Location: index.php"); //later change to the location 
+                    }
                     exit();
                 } else {
                     $error = "Invalid password.";
@@ -73,9 +80,9 @@
             <label for="password">Password</label> 
             <input type="password" id="password" name="password" required>
         </div>
-        <div id="confirm-field">
+        <div id="confirm-field" style="display: none;">
             <label for="confirm">Confirm password</label>
-            <input type="password" id="confirm" name="confirm" required>
+            <input type="password" id="confirm" name="confirm">
         </div>
         <input type="submit" name="action" id="login-btn" value="Login">
         <input type="submit" name="action" id="signup-btn" value="Sign Up">

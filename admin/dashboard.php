@@ -1,3 +1,11 @@
+<?php
+session_start();
+if(empty($_SESSION['user']) || empty($_SESSION['is_admin'])){
+    // not logged in or not admin -> redirect to login
+    header("Location: ../login/login.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,9 +20,9 @@
 
 <div class="app container">
   <aside class="sidebar">
-<h2>Admin</h2>
+    <h2>Admin</h2>
     <nav class="menu">
-      <a href="dashboard.php" >Dashboard</a>
+      <a href="dashboard.php">Dashboard</a>
       <a href="manage_users.php">Manage Users</a>
       <a href="manage_posts.php">Manage Posts</a>
       <a href="reports.php">Reports</a>
