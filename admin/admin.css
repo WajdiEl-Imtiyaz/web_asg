@@ -192,3 +192,87 @@ main h1 {
 .menu {
   margin-top: 8px;
 }
+
+/* Status styles */
+.status-active {
+  color: #4ca9c2;
+  background: rgba(76, 169, 194, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-banned {
+  color: #dc3545;
+  background: rgba(220, 53, 69, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Role styles */
+.role-admin {
+  color: #f57c00;
+  background: rgba(245, 124, 0, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.role-user {
+  color: #4ca9c2;
+  background: rgba(76, 169, 194, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Button styles */
+.ban-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.ban-btn:hover {
+  background: #c82333;
+}
+
+.unban-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.unban-btn:hover {
+  background: #218838;
+}
+
+.edit-btn {
+  background: #4ca9c2;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 5px;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+}
+
+.edit-btn:hover {
+  background: #3a8ca3;
+}
