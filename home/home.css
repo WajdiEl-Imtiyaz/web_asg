@@ -71,6 +71,25 @@ main {
   box-shadow: 0 0 10px rgba(76, 169, 194, 0.2); /* Optional: adds subtle glow */
 }
 
+.left-sidebar .logout {
+  display: block;
+  margin-top: auto;
+  padding: 10px 12px;
+  color: #e8e9ed;
+  text-decoration: none;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  border: 2px solid transparent;
+  transition: all 0.2s ease-in-out;
+}
+.left-sidebar .logout:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(5px);
+  color: #4ca9c2;
+  border: 2px solid #4ca9c2;
+  box-shadow: 0 0 10px rgba(76, 169, 194, 0.2);
+}
+
 .user-post-input-container {
   position: fixed;
   left: 320px;
@@ -110,9 +129,17 @@ main {
 #home-avatar,
 #post-btn {
   border-radius: 50%;
-  background-color: #ffffff;
+  border: none;
+  background-color: #f57c00;
   width: 50px;
   height: 50px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+#post-btn:hover {
+  background-color: #d16900;
+  transform: translateY(-2px);
 }
 
 .post-card-list {
@@ -191,4 +218,55 @@ main {
 .like-btn:hover,
 .comment-btn:hover {
   color: #4ca9c2;
+}
+
+.popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background: #1c2433;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.popup-content h2 {
+  margin-bottom: 1rem;
+}
+
+.popup-content label {
+  display: block;
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+.popup-content input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #2b6b67;
+  border-radius: 4px;
+  margin-top: 0.2rem;
+}
+
+.popup-content button {
+  margin-top: 1rem;
+  padding: 10px 20px;
+  background: #f57c00;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.popup-content button:hover {
+  background: #d16900;
 }
