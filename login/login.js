@@ -1,27 +1,30 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const showLoginBtn = document.getElementById('show-login-btn');
-  const showSignupBtn = document.getElementById('show-signup-btn');
-  const confirmPass = document.getElementById('confirm-field');
-  const signupBtn = document.getElementById('signup-btn');
-  const loginBtn = document.getElementById('login-btn');
+document.addEventListener("DOMContentLoaded", () => {
+  const showLoginBtn = document.getElementById("show-login-btn");
+  const showSignupBtn = document.getElementById("show-signup-btn");
+  const confirmField = document.getElementById("confirm-field");
+  const confirmInput = document.getElementById("confirm");
+  const signupBtn = document.getElementById("signup-btn");
+  const loginBtn = document.getElementById("login-btn");
 
   function setActive(btn) {
-    showLoginBtn.classList.remove('active');
-    showSignupBtn.classList.remove('active');
-    btn.classList.add('active');
+    showLoginBtn.classList.remove("active");
+    showSignupBtn.classList.remove("active");
+    btn.classList.add("active");
   }
 
-  showSignupBtn.addEventListener('click', function () {
-    confirmPass.style.display = 'block';
-    signupBtn.style.display = 'block';
-    loginBtn.style.display = 'none';
+  showSignupBtn.addEventListener("click", function () {
+    confirmField.style.display = "block";
+    confirmInput.setAttribute("required", "");
+    signupBtn.style.display = "block";
+    loginBtn.style.display = "none";
     setActive(showSignupBtn);
   });
 
-  showLoginBtn.addEventListener('click', function () {
-    confirmPass.style.display = 'none';
-    signupBtn.style.display = 'none';
-    loginBtn.style.display = 'block';
+  showLoginBtn.addEventListener("click", function () {
+    confirmField.style.display = "none";
+    confirmInput.removeAttribute("required");
+    signupBtn.style.display = "none";
+    loginBtn.style.display = "block";
     setActive(showLoginBtn);
   });
 
