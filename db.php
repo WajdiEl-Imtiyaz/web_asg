@@ -1,7 +1,7 @@
 <?php
 $host = 'localhost';
 $user = 'root';
-$pass = '';
+$pass = '1234';
 $dbname = 'wd1_asg';
 
 $conn = new mysqli($host, $user, $pass, $dbname);
