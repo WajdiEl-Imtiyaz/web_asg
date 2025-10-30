@@ -24,7 +24,7 @@ if(isset($_GET['logout'])){
 <body>
 
 <div class="app container">
-  <aside class="sidebar">
+  <div class="sidebar">
     <h2>Admin </h2>
     <nav class="menu">
       <a href="dashboard.php" >Dashboard</a>
@@ -33,7 +33,7 @@ if(isset($_GET['logout'])){
       <a href="reports.php">Reports</a>
     </nav>
       <a href="?logout=1" class="logout-btn">Logout</a>
-  </aside>
+  </div>
 
   <main>
     <h1>Report Summary</h1>

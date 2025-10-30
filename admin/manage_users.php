@@ -13,11 +13,6 @@ if(isset($_GET['logout'])){
     header("Location: ../login/login.php");
     exit();
 }
-// Check if user is admin
-if (!isset($_SESSION['user']) || !$_SESSION['is_admin']) {
-    header("Location: ../login/login.php");
-    exit();
-}
 
 // Handle ban/unban actions
 if (isset($_GET['action']) && isset($_GET['id'])) {
@@ -33,29 +28,52 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
     
     if ($action === 'ban') {
         $sql = "UPDATE users SET is_banned = 1 WHERE uId = ?";
-        $alert_message = "User banned successfully!";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "i", $user_id);
+        
+        if(mysqli_stmt_execute($stmt)) {
+            $_SESSION['success'] = "User banned successfully!";
+        } else {
+            $_SESSION['error'] = "Error banning user.";
+        }
     } elseif ($action === 'unban') {
         $sql = "UPDATE users SET is_banned = 0 WHERE uId = ?";
-        $alert_message = "User unbanned successfully!";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "i", $user_id);
+        
+        if(mysqli_stmt_execute($stmt)) {
+            $_SESSION['success'] = "User unbanned successfully!";
+        } else {
+            $_SESSION['error'] = "Error unbanning user.";
+        }
     }
-    
-    $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, "i", $user_id);
-    
-    if (mysqli_stmt_execute($stmt)) {
-        // Set alert message in session to show after redirect
-        $_SESSION['alert_message'] = $alert_message;
-        header("Location: manage_users.php");
-        exit();
-    } else {
-        $_SESSION['alert_message'] = "Error updating user.";
-    }
+    header("Location: manage_users.php");
+    exit();
 }
 
-// Fetch users from database
-$sql = "SELECT uId, uEmail, is_admin, is_banned, created_at FROM users ORDER BY created_at DESC";
+// Fetch users from database with profile information
+$sql = "SELECT u.uId, u.uEmail, u.is_admin, u.is_banned, u.created_at,
+               COALESCE(up.name, u.uEmail) as display_name 
+        FROM users u 
+        LEFT JOIN user_profile up ON u.uId = up.uID 
+        ORDER BY u.created_at DESC";
 $result = mysqli_query($conn, $sql);
 $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+// Count users by status
+$active_count = 0;
+$banned_count = 0;
+$admin_count = 0;
+foreach ($users as $user) {
+    if ($user['is_banned']) {
+        $banned_count++;
+    } else {
+        $active_count++;
+    }
+    if ($user['is_admin']) {
+        $admin_count++;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -65,11 +83,24 @@ $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Manage Users</title>
     <link rel="stylesheet" href="admin.css">
+    <style>
+        .user-row.banned {
+            opacity: 0.7;
+            background: rgba(220, 53, 69, 0.05);
+        }
+        .user-row.banned:hover {
+            opacity: 0.9;
+            background: rgba(220, 53, 69, 0.1);
+        }
+        .status-filter {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
 
 <div class="app container">
-  <aside class="sidebar">
+  <div class="sidebar">
     <h2>Admin</h2>
     <nav class="menu">
       <a href="dashboard.php">Dashboard</a>
@@ -77,18 +108,44 @@ $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
       <a href="manage_posts.php">Manage Posts</a>
       <a href="reports.php">Reports</a>
     </nav>
+    <div class="logout-section">
         <a href="?logout=1" class="logout-btn">Logout</a>
-  </aside>
+    </div>
+  </div>
 
   <main>
     <h1>Manage Users</h1>
     
+    <!-- Display success/error messages -->
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="alert alert-success"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
+    <?php endif; ?>
+    
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-error"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
+    <?php endif; ?>
+    
     <div class="card">
-        <h3>User List (<?php echo count($users); ?> users)</h3>
+        <h3>All Users (<?php echo count($users); ?> total)</h3>
+        
+        <!-- Status Summary -->
+        <div class="status-filter">
+            <span class="status-active" style="margin-right: 15px;">
+                Active: <?php echo $active_count; ?>
+            </span>
+            <span class="status-banned" style="margin-right: 15px;">
+                Banned: <?php echo $banned_count; ?>
+            </span>
+            <span class="role-admin">
+                Admins: <?php echo $admin_count; ?>
+            </span>
+        </div>
+        
         <table class="table">
             <thead>
                 <tr>
                     <th>ID</th>
+                    <th>Display Name</th>
                     <th>Email</th>
                     <th>Role</th>
                     <th>Status</th>
@@ -98,8 +155,14 @@ $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
             </thead>
             <tbody>
                 <?php foreach ($users as $user): ?>
-                <tr>
+                <tr class="user-row <?php echo $user['is_banned'] ? 'banned' : ''; ?>">
                     <td><?php echo htmlspecialchars($user['uId']); ?></td>
+                    <td>
+                        <?php echo htmlspecialchars($user['display_name']); ?>
+                        <?php if ($user['display_name'] !== $user['uEmail']): ?>
+                            <br><small class="text-muted">(Profile Name)</small>
+                        <?php endif; ?>
+                    </td>
                     <td><?php echo htmlspecialchars($user['uEmail']); ?></td>
                     <td>
                         <?php if ($user['is_admin']): ?>
@@ -115,20 +178,28 @@ $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
                             <span class="status-active">Active</span>
                         <?php endif; ?>
                     </td>
-                    <td><?php echo date('M j, Y', strtotime($user['created_at'])); ?></td>
+                    <td><?php echo date('M j, Y g:i A', strtotime($user['created_at'])); ?></td>
                     <td>
                         <?php if ($user['uId'] != 1): // Don't allow banning the main admin ?>
                             <?php if ($user['is_banned']): ?>
-                                <button class="unban-btn" onclick="confirmAction(<?php echo $user['uId']; ?>, 'unban')">Unban</button>
+                                <button class="unban-btn" onclick="confirmUnban(<?php echo $user['uId']; ?>)">Unban</button>
                             <?php else: ?>
-                                <button class="ban-btn" onclick="confirmAction(<?php echo $user['uId']; ?>, 'ban')">Ban</button>
+                                <button class="ban-btn" onclick="confirmBan(<?php echo $user['uId']; ?>)">Ban</button>
                             <?php endif; ?>
                         <?php else: ?>
-                            <span style="color: #b2b5be; font-size: 12px;">Protected</span>
+                            <span class="text-muted" style="font-size: 12px;">Protected</span>
                         <?php endif; ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>
+                
+                <?php if (empty($users)): ?>
+                <tr>
+                    <td colspan="7" class="text-center text-muted" style="padding: 20px;">
+                        No users found in the database.
+                    </td>
+                </tr>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
@@ -136,26 +207,17 @@ $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
 </div>
 
 <script>
-function confirmAction(userId, action) {
-    const message = action === 'ban' 
-        ? 'Are you sure you want to ban this user? They will not be able to login.'
-        : 'Are you sure you want to unban this user? They will be able to login again.';
-    
-    if (confirm(message)) {
-        window.location.href = 'manage_users.php?action=' + action + '&id=' + userId;
+function confirmBan(userId) {
+    if(confirm('Are you sure you want to ban this user? They will not be able to login.')) {
+        window.location.href = 'manage_users.php?action=ban&id=' + userId;
     }
 }
 
-// Show alert popup if there's a message from PHP
-<?php if (isset($_SESSION['alert_message'])): ?>
-    alert("<?php echo $_SESSION['alert_message']; ?>");
-    <?php unset($_SESSION['alert_message']); ?>
-<?php endif; ?>
-
-<?php if (isset($_SESSION['error'])): ?>
-    alert("Error: <?php echo $_SESSION['error']; ?>");
-    <?php unset($_SESSION['error']); ?>
-<?php endif; ?>
+function confirmUnban(userId) {
+    if(confirm('Are you sure you want to unban this user? They will be able to login again.')) {
+        window.location.href = 'manage_users.php?action=unban&id=' + userId;
+    }
+}
 </script>
 
 </body>
