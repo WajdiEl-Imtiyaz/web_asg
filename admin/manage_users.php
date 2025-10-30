@@ -1,7 +1,18 @@
 <?php
 session_start();
 require '../db.php';
+if(empty($_SESSION['user']) || empty($_SESSION['is_admin'])){
+    // not logged in or not admin -> redirect to login
+    header("Location: ../login/login.php");
+    exit();
+}
 
+// Handle logout
+if(isset($_GET['logout'])){
+    session_destroy();
+    header("Location: ../login/login.php");
+    exit();
+}
 // Check if user is admin
 if (!isset($_SESSION['user']) || !$_SESSION['is_admin']) {
     header("Location: ../login/login.php");
@@ -66,6 +77,7 @@ $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
       <a href="manage_posts.php">Manage Posts</a>
       <a href="reports.php">Reports</a>
     </nav>
+        <a href="?logout=1" class="logout-btn">Logout</a>
   </aside>
 
   <main>

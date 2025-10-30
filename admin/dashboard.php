@@ -5,6 +5,13 @@ if(empty($_SESSION['user']) || empty($_SESSION['is_admin'])){
     header("Location: ../login/login.php");
     exit();
 }
+
+// Handle logout
+if(isset($_GET['logout'])){
+    session_destroy();
+    header("Location: ../login/login.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,8 +23,6 @@ if(empty($_SESSION['user']) || empty($_SESSION['is_admin'])){
 </head>
 <body>
 
-
-
 <div class="app container">
   <aside class="sidebar">
     <h2>Admin</h2>
@@ -27,6 +32,9 @@ if(empty($_SESSION['user']) || empty($_SESSION['is_admin'])){
       <a href="manage_posts.php">Manage Posts</a>
       <a href="reports.php">Reports</a>
     </nav>
+    <div class="logout-section">
+      <a href="?logout=1" class="logout-btn">Logout</a>
+    </div>
   </aside>
 
   <main>
