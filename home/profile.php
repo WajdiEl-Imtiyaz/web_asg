@@ -23,7 +23,6 @@ if(!isset($_SESSION['user'])){
 
 $email = $_SESSION['user'];
 
-// Get user ID
 $sql = "SELECT uID FROM users WHERE uEmail = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $email);
@@ -32,7 +31,6 @@ $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 $uID = $user['uID'];
 
-// Get or create user profile
 $sql = "SELECT * FROM user_profile WHERE uID = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $uID);
@@ -40,15 +38,13 @@ $stmt->execute();
 $result = $stmt->get_result();
 $userProfile = $result->fetch_assoc();
 
-// If no profile exists, create a basic one
 if($result->num_rows === 0) {
     $insert = "INSERT INTO user_profile (uID, name) VALUES (?, ?)";
     $stmt = $conn->prepare($insert);
-    $name = explode('@', $email)[0]; // Use username part of email as default name
+    $name = explode('@', $email)[0];
     $stmt->bind_param("is", $uID, $name);
     $stmt->execute();
     
-    // Fetch the newly created profile
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $uID);
     $stmt->execute();
@@ -56,19 +52,16 @@ if($result->num_rows === 0) {
     $userProfile = $result->fetch_assoc();
 }
 
-// Handle profile updates
 if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
     $name = $_POST['name'];
     $age = $_POST['age'];
     $bio = $_POST['bio'];
     
-    // Handle avatar upload
-    $avatar = $userProfile['avatar']; // Keep existing avatar by default
+    $avatar = $userProfile['avatar']; 
     
     if(isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = '../uploads/avatars/';
         
-        // Create directory if it doesn't exist
         if(!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
@@ -76,7 +69,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         $fileName = uniqid() . '_' . basename($_FILES['avatar']['name']);
         $uploadFile = $uploadDir . $fileName;
         
-        // Check file type
         $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
         $fileType = mime_content_type($_FILES['avatar']['tmp_name']);
         
@@ -84,7 +76,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
             if(move_uploaded_file($_FILES['avatar']['tmp_name'], $uploadFile)) {
                 $avatar = 'uploads/avatars/' . $fileName;
                 
-                // Delete old avatar if it exists
                 if(!empty($userProfile['avatar']) && file_exists('../' . $userProfile['avatar'])) {
                     unlink('../' . $userProfile['avatar']);
                 }
@@ -92,13 +83,11 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         }
     }
     
-    // Update profile in database
     $update = "UPDATE user_profile SET name = ?, age = ?, bio = ?, avatar = ? WHERE uID = ?";
     $stmt = $conn->prepare($update);
     $stmt->bind_param("sissi", $name, $age, $bio, $avatar, $uID);
     
     if($stmt->execute()) {
-        // Refresh profile data
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $uID);
         $stmt->execute();
@@ -110,7 +99,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
     }
 }
 
-// Get user's posts for profile
 $posts_query = "SELECT p.postID, p.content, p.image, p.createdAt, p.is_archived
                 FROM posts p 
                 WHERE p.uID = ? AND (p.is_archived = FALSE OR p.is_archived IS NULL)
@@ -121,7 +109,6 @@ $stmt->execute();
 $posts_result = $stmt->get_result();
 $user_posts = $posts_result->fetch_all(MYSQLI_ASSOC);
 
-// Get post count
 $post_count = count($user_posts);
 ?>
 <!DOCTYPE html>
@@ -151,7 +138,6 @@ $post_count = count($user_posts);
             <header><h1>Profile</h1></header>
             <hr id="header-separator">
 
-            <!-- Success/Error Messages -->
             <?php if (isset($success_message)): ?>
                 <div class="alert alert-success"><?php echo $success_message; ?></div>
             <?php endif; ?>
@@ -161,7 +147,6 @@ $post_count = count($user_posts);
             <?php endif; ?>
 
             <div class="profile-container">
-    <!-- Profile Header -->
                 <div class="profile-header">
                     <div class="profile-top-row">
                         <img src="<?php echo !empty($userProfile['avatar']) ? '../' . htmlspecialchars($userProfile['avatar']) : 'https://via.placeholder.com/80/1c2433/4ca9c2?text=USER'; ?>" 
@@ -178,7 +163,6 @@ $post_count = count($user_posts);
                     </div>
                 </div>
 
-                <!-- User's Posts -->
                 <div class="user-posts-section">
                     <h2 class="section-title">My Posts (<?php echo $post_count; ?>)</h2>
                     
@@ -242,7 +226,6 @@ $post_count = count($user_posts);
         </div>
     </div>
 
-    <!-- Edit Profile Modal -->
     <div id="editProfileModal" class="modal">
         <div class="modal-content">
             <h2>Edit Profile</h2>
@@ -300,7 +283,6 @@ $post_count = count($user_posts);
             }
         }
         
-        // Close modal when clicking outside
         window.onclick = function(event) {
             const modal = document.getElementById('editProfileModal');
             if (event.target === modal) {
