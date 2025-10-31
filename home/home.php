@@ -64,14 +64,12 @@
             exit();
         }
     }
-
-    $posts_query = "SELECT p.postID, p.uID, p.content, p.image, p.createdAt, p.is_archived, up.name, up.avatar 
+    
+    $posts_query = "SELECT p.postID, p.uID, p.content, p.image, p.createdAt, p.is_archived, 
+                   (SELECT up.name FROM user_profile up WHERE up.uID = p.uID ORDER BY up.profileID DESC LIMIT 1) as name,
+                   (SELECT up.avatar FROM user_profile up WHERE up.uID = p.uID ORDER BY up.profileID DESC LIMIT 1) as avatar
                    FROM posts p 
-                   LEFT JOIN user_profile up ON (p.uID = up.uID AND up.profileID = (
-                       SELECT MAX(profileID) FROM user_profile up2 WHERE up2.uID = p.uID
-                   ))
-                   WHERE p.is_archived = FALSE OR p.is_archived IS NULL
-                   GROUP BY p.postID
+                   WHERE (p.is_archived = FALSE OR p.is_archived IS NULL)
                    ORDER BY p.createdAt DESC";
     $posts_result = $conn->query($posts_query);
     $posts = $posts_result->fetch_all(MYSQLI_ASSOC);
@@ -128,7 +126,7 @@
                             <?php echo !empty($post['avatar']) ? "<img src='{$post['avatar']}' alt='Profile'>" : ""; ?>
                         </div>
                         <div class="user-info">
-                            <span class="user-name"><?php echo htmlspecialchars($post['name']); ?></span>
+                            <span class="user-name"><?php echo htmlspecialchars($post['name'] ?? 'Anonymous'); ?></span>
                             <span class="post-timestamp">
                                 <?php 
                                     $date = new DateTime($post['createdAt']);
