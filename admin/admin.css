@@ -423,6 +423,12 @@ textarea:focus {
     flex-direction: column;
   }
 
+  .table {
+    max-width: 360px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
   .table td {
     max-width: 100px;
     overflow: hidden;

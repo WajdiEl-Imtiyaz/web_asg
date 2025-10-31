@@ -46,16 +46,21 @@ if(isset($_GET['action']) && isset($_GET['id'])) {
     }
 }
 
-// Modified query to prevent duplicates - get only the latest profile for each user
+// Modified query to use a derived table for latest profiles
 $sql = "SELECT p.postID, p.content, p.image, p.createdAt, p.is_archived,
                u.uEmail, u.uId,
-               COALESCE(up.name, u.uEmail) as display_name 
+               COALESCE(latest_profile.name, u.uEmail) as display_name 
         FROM posts p 
         JOIN users u ON p.uID = u.uId 
-        LEFT JOIN user_profile up ON (p.uID = up.uID AND up.profileID = (
-            SELECT MAX(profileID) FROM user_profile up2 WHERE up2.uID = p.uID
-        ))
-        GROUP BY p.postID
+        LEFT JOIN (
+            SELECT up1.* 
+            FROM user_profile up1
+            INNER JOIN (
+                SELECT uID, MAX(profileID) as max_profile_id
+                FROM user_profile
+                GROUP BY uID
+            ) up2 ON up1.uID = up2.uID AND up1.profileID = up2.max_profile_id
+        ) latest_profile ON p.uID = latest_profile.uID
         ORDER BY p.createdAt DESC";
 $result = mysqli_query($conn, $sql);
 $posts = mysqli_fetch_all($result, MYSQLI_ASSOC);
@@ -201,6 +206,15 @@ foreach ($posts as $post) {
                 <?php endif; ?>
             </tbody>
         </table>
+    </div>
+
+    <div class="card">
+        <h3>Quick Actions</h3>
+        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+            <a href="manage_users.php" class="edit-btn">Manage Users</a>
+            <a href="manage_posts.php" class="edit-btn">Manage Posts</a>
+            <a href="reports.php" class="edit-btn">View Reports</a>
+        </div>
     </div>
   </main>
 </div>
