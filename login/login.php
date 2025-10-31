@@ -84,6 +84,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
     <link rel="stylesheet" href="login.css">
+    <style>
+        .comet-sphere-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #4ca9c2;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(76, 169, 194, 0.5);
+            letter-spacing: 1px;
+        }
+        
+        #login-dir-btn {
+            width: 85%;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+        
+        #login-dir-btn button {
+            width: 100px;
+            height: 35px;
+            border-radius: 5px;
+            border: 2px solid transparent;
+            background-color: #1c2433;
+            color: #e8e9ed;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        
+        #login-dir-btn button:hover {
+            border-color: #4ca9c2;
+            color: #4ca9c2;
+        }
+        
+        #login-dir-btn button.active {
+            background-color: rgba(76, 169, 194, 0.2);
+            color: #4ca9c2;
+            border: 2px solid #4ca9c2;
+            transform: translateY(-2px);
+        }
+    </style>
     <script>
         // Prevent form resubmission on page refresh/back
         if (window.history.replaceState) {
@@ -105,11 +148,15 @@
 </head>
 
 <body>
-    <div id="login-dir-btn">
-        <button type="button" id="show-login-btn" class="active">Log in</button>
-        <button type="button" id="show-signup-btn">Sign up</button>
-    </div>
+    <div class="comet-sphere-title">Comet Sphere</div>
+    
     <form method="POST" id="login-form">
+        <!-- Login/Sign Up buttons inside the form -->
+        <div id="login-dir-btn">
+            <button type="button" id="show-login-btn" class="active">Log in</button>
+            <button type="button" id="show-signup-btn">Sign up</button>
+        </div>
+        
         <div id="email-field">
             <label for="email">Email</label>
             <input type="email" id="email" name="email" value="<?php echo isset($email) ? htmlspecialchars($email) : ''; ?>" required>
