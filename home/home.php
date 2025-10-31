@@ -64,7 +64,7 @@
             exit();
         }
     }
-    
+
     $posts_query = "SELECT p.postID, p.uID, p.content, p.image, p.createdAt, p.is_archived, 
                    (SELECT up.name FROM user_profile up WHERE up.uID = p.uID ORDER BY up.profileID DESC LIMIT 1) as name,
                    (SELECT up.avatar FROM user_profile up WHERE up.uID = p.uID ORDER BY up.profileID DESC LIMIT 1) as avatar
@@ -106,10 +106,10 @@
       <div class="left-sidebar">
         <h2>Logo</h2>
         <nav class="menu">
-          <a href="../home/home.php">Home</a>
+          <a href="home.php">Home</a>
           <a href="">Explore</a>
           <a href="">Notification</a>
-          <a href="">Profile</a>
+          <a href="profile.php">Profile</a>
         </nav>
                 <a href="?logout=1" class="logout">Logout</a>
       </div>
