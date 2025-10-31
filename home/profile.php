@@ -2,6 +2,20 @@
 session_start();
 require '../db.php';
 
+// Function to get correct avatar path
+function getAvatarPath($avatar) {
+    if (empty($avatar)) {
+        return '';
+    }
+    
+    // If avatar path doesn't start with ../, add it
+    if (strpos($avatar, '../') !== 0) {
+        return '../' . $avatar;
+    }
+    
+    return $avatar;
+}
+
 if (isset($_GET['logout'])) {
     $_SESSION = array();
     if (ini_get("session.use_cookies")) {
@@ -38,6 +52,11 @@ $stmt->execute();
 $result = $stmt->get_result();
 $userProfile = $result->fetch_assoc();
 
+// Fix current user's avatar path
+if (!empty($userProfile['avatar'])) {
+    $userProfile['avatar'] = getAvatarPath($userProfile['avatar']);
+}
+
 if($result->num_rows === 0) {
     $insert = "INSERT INTO user_profile (uID, name) VALUES (?, ?)";
     $stmt = $conn->prepare($insert);
@@ -50,6 +69,11 @@ if($result->num_rows === 0) {
     $stmt->execute();
     $result = $stmt->get_result();
     $userProfile = $result->fetch_assoc();
+    
+    // Fix avatar path for new profile
+    if (!empty($userProfile['avatar'])) {
+        $userProfile['avatar'] = getAvatarPath($userProfile['avatar']);
+    }
 }
 
 if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
@@ -93,6 +117,12 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         $stmt->execute();
         $result = $stmt->get_result();
         $userProfile = $result->fetch_assoc();
+        
+        // Fix avatar path after update
+        if (!empty($userProfile['avatar'])) {
+            $userProfile['avatar'] = getAvatarPath($userProfile['avatar']);
+        }
+        
         $success_message = "Profile updated successfully!";
     } else {
         $error_message = "Error updating profile.";
@@ -149,8 +179,16 @@ $post_count = count($user_posts);
             <div class="profile-container">
                 <div class="profile-header">
                     <div class="profile-top-row">
-                        <img src="<?php echo !empty($userProfile['avatar']) ? '../' . htmlspecialchars($userProfile['avatar']) : 'https://via.placeholder.com/80/1c2433/4ca9c2?text=USER'; ?>" 
-                            alt="Profile Avatar" class="profile-avatar">
+                        <div class="profile-avatar">
+                            <?php 
+                                if (!empty($userProfile['avatar'])) {
+                                    echo "<img src='{$userProfile['avatar']}' alt='Profile Avatar'>";
+                                } else {
+                                    $initial = !empty($userProfile['name']) ? substr($userProfile['name'], 0, 1) : 'U';
+                                    echo "<div class='default-avatar'>$initial</div>";
+                                }
+                            ?>
+                        </div>
                         <div class="profile-info">
                             <div class="profile-name-row">
                                 <h1 class="profile-name"><?php echo htmlspecialchars($userProfile['name']); ?></h1>
@@ -172,7 +210,14 @@ $post_count = count($user_posts);
                                 <div class="post-card">
                                     <div class="post-header">
                                         <div class="user-avatar">
-                                            <img src="<?php echo !empty($userProfile['avatar']) ? '../' . htmlspecialchars($userProfile['avatar']) : 'https://via.placeholder.com/40/1c2433/4ca9c2?text=USER'; ?>" alt="Profile">
+                                            <?php 
+                                                if (!empty($userProfile['avatar'])) {
+                                                    echo "<img src='{$userProfile['avatar']}' alt='Profile'>";
+                                                } else {
+                                                    $initial = !empty($userProfile['name']) ? substr($userProfile['name'], 0, 1) : 'U';
+                                                    echo "<div class='default-avatar'>$initial</div>";
+                                                }
+                                            ?>
                                         </div>
                                         <div class="user-info">
                                             <span class="user-name"><?php echo htmlspecialchars($userProfile['name']); ?></span>
@@ -218,10 +263,10 @@ $post_count = count($user_posts);
             <input type="search" id="search" placeholder="Search..." />
             <h2>Trending</h2>
             <nav class="menu">
-                <a href="../home.php">#Home</a>
+                <a href="home.php">#Home</a>
                 <a href="">#Explore</a>
                 <a href="">#Notification</a>
-                <a href="/profile/profile.php">#Profile</a>
+                <a href="profile.php">#Profile</a>
             </nav>
         </div>
     </div>
@@ -233,11 +278,16 @@ $post_count = count($user_posts);
                 <div class="form-group">
                     <label for="avatar">Profile Picture</label>
                     <input type="file" id="avatar" name="avatar" accept="image/*" onchange="previewAvatar(this)">
-                    <?php if (!empty($userProfile['avatar'])): ?>
-                        <img src="../<?php echo htmlspecialchars($userProfile['avatar']); ?>" alt="Current Avatar" class="avatar-preview" id="avatarPreview">
-                    <?php else: ?>
-                        <img src="https://via.placeholder.com/100/1c2433/4ca9c2?text=USER" alt="Avatar Preview" class="avatar-preview" id="avatarPreview">
-                    <?php endif; ?>
+                    <div class="avatar-preview-container">
+                        <?php 
+                            if (!empty($userProfile['avatar'])) {
+                                echo "<img src='{$userProfile['avatar']}' alt='Current Avatar' class='avatar-preview' id='avatarPreview'>";
+                            } else {
+                                $initial = !empty($userProfile['name']) ? substr($userProfile['name'], 0, 1) : 'U';
+                                echo "<div class='avatar-preview default-avatar' id='avatarPreview'>$initial</div>";
+                            }
+                        ?>
+                    </div>
                 </div>
                 
                 <div class="form-group">
@@ -277,7 +327,18 @@ $post_count = count($user_posts);
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    preview.src = e.target.result;
+                    // If it's a default avatar div, replace with img
+                    if (preview.classList.contains('default-avatar')) {
+                        const newImg = document.createElement('img');
+                        newImg.src = e.target.result;
+                        newImg.alt = 'Avatar Preview';
+                        newImg.className = 'avatar-preview';
+                        newImg.id = 'avatarPreview';
+                        preview.parentNode.replaceChild(newImg, preview);
+                    } else {
+                        // If it's already an img, just update src
+                        preview.src = e.target.result;
+                    }
                 }
                 reader.readAsDataURL(input.files[0]);
             }

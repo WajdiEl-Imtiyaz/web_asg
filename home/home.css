@@ -369,3 +369,134 @@ main {
 .popup-content button:hover {
   background: #d16900;
 }
+
+/* Additional CSS for avatar fixes */
+.user-avatar,
+.comment-avatar,
+#home-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 2px solid #4ca9c2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-avatar img,
+.comment-avatar img,
+#home-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.default-avatar {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #4ca9c2, #2d6b67);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+  border-radius: 50%;
+}
+
+.comment-avatar {
+  width: 35px;
+  height: 35px;
+}
+
+.comment {
+  margin-bottom: 15px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid #2d6b67;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.comment-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.comment-user {
+  font-weight: bold;
+  color: #4ca9c2;
+  font-size: 14px;
+}
+
+.comment-time {
+  font-size: 12px;
+  color: #a0a0a0;
+}
+
+.comment-text {
+  margin: 0;
+  color: #e8e9ed;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.comment-form {
+  margin-top: 15px;
+}
+
+.comment-input-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.comment-input {
+  flex: 1;
+  padding: 10px;
+  background: #0e0e12;
+  border: 1px solid #2d6b67;
+  border-radius: 20px;
+  color: white;
+  font-size: 14px;
+}
+
+.comment-input:focus {
+  outline: none;
+  border-color: #4ca9c2;
+}
+
+.comment-input-container button {
+  background: #4ca9c2;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.comment-input-container button:hover {
+  background: #3a8ca3;
+}
+
+.no-posts {
+  text-align: center;
+  color: #b2b5be;
+  padding: 40px;
+  font-style: italic;
+  background: #1c2433;
+  border-radius: 8px;
+  border: 1px solid #2d6b67;
+  margin: 20px 0;
+}
