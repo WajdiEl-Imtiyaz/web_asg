@@ -37,6 +37,7 @@ $sql = "SELECT COUNT(DISTINCT postID) as archived_posts FROM posts WHERE is_arch
 $result = mysqli_query($conn, $sql);
 $archived_posts = mysqli_fetch_assoc($result)['archived_posts'];
 
+// Fixed query for recent posts
 $sql = "SELECT p.postID, p.content, p.createdAt, 
                COALESCE(up.name, u.uEmail) as author_name 
         FROM posts p 
@@ -45,23 +46,22 @@ $sql = "SELECT p.postID, p.content, p.createdAt,
             SELECT MAX(profileID) FROM user_profile up2 WHERE up2.uID = p.uID
         ))
         WHERE (p.is_archived = FALSE OR p.is_archived IS NULL)
-        GROUP BY p.postID
         ORDER BY p.createdAt DESC 
         LIMIT 10";
 $recent_posts_result = mysqli_query($conn, $sql);
-$recent_posts = mysqli_fetch_all($recent_posts_result, MYSQLI_ASSOC);
+$recent_posts = $recent_posts_result ? mysqli_fetch_all($recent_posts_result, MYSQLI_ASSOC) : [];
 
+// Fixed query for recent users
 $sql = "SELECT u.uId, u.uEmail, u.created_at, 
                COALESCE(up.name, u.uEmail) as display_name 
         FROM users u 
         LEFT JOIN user_profile up ON (u.uId = up.uID AND up.profileID = (
             SELECT MAX(profileID) FROM user_profile up2 WHERE up2.uID = u.uId
         ))
-        GROUP BY u.uId
         ORDER BY u.created_at DESC 
         LIMIT 10";
 $recent_users_result = mysqli_query($conn, $sql);
-$recent_users = mysqli_fetch_all($recent_users_result, MYSQLI_ASSOC);
+$recent_users = $recent_users_result ? mysqli_fetch_all($recent_users_result, MYSQLI_ASSOC) : [];
 ?>
 
 <!DOCTYPE html>
