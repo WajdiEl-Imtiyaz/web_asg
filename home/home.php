@@ -62,6 +62,32 @@
             
             header("Location: ".$_SERVER['PHP_SELF']);
             exit();
+        } elseif (isset($_POST['like_post_id'])) {
+            $postId = intval($_POST['like_post_id']);
+
+            // Check if the user already liked the post
+            $checkSql = "SELECT likeID FROM likes WHERE uID = ? AND postID = ? LIMIT 1";
+            $checkStmt = $conn->prepare($checkSql);
+            $checkStmt->bind_param("ii", $uID, $postId);
+            $checkStmt->execute();
+            $checkRes = $checkStmt->get_result();
+
+            if($checkRes && $checkRes->num_rows > 0) {
+                // Unlike
+                $delSql = "DELETE FROM likes WHERE uID = ? AND postID = ?";
+                $delStmt = $conn->prepare($delSql);
+                $delStmt->bind_param("ii", $uID, $postId);
+                $delStmt->execute();
+            } else {
+                // Like
+                $insSql = "INSERT INTO likes (uID, postID) VALUES (?, ?)";
+                $insStmt = $conn->prepare($insSql);
+                $insStmt->bind_param("ii", $uID, $postId);
+                $insStmt->execute();
+            }
+
+            header("Location: ".$_SERVER['PHP_SELF']);
+            exit();
         }
     }
 
@@ -72,6 +98,32 @@
                    ORDER BY p.createdAt DESC";
     $posts_result = $conn->query($posts_query);
     $posts = $posts_result->fetch_all(MYSQLI_ASSOC);
+
+    $likesCount = [];
+    $userLiked = [];
+    $postIds = array_column($posts, 'postID');
+    if (!empty($postIds)) {
+        $ids = implode(',', array_map('intval', $postIds));
+
+        $countSql = "SELECT postID, COUNT(*) as cnt FROM likes WHERE postID IN ($ids) GROUP BY postID";
+        $countRes = $conn->query($countSql);
+        if ($countRes) {
+            while ($row = $countRes->fetch_assoc()) {
+                $likesCount[$row['postID']] = (int)$row['cnt'];
+            }
+        }
+
+        $likedSql = "SELECT postID FROM likes WHERE uID = ? AND postID IN ($ids)";
+        $likedStmt = $conn->prepare($likedSql);
+        $likedStmt->bind_param("i", $uID);
+        $likedStmt->execute();
+        $likedRes = $likedStmt->get_result();
+        if ($likedRes) {
+            while ($r = $likedRes->fetch_assoc()) {
+                $userLiked[(int)$r['postID']] = true;
+            }
+        }
+    }
 ?>
 
 <!DOCTYPE html>
@@ -148,7 +200,15 @@
                         <?php endif; ?>
                     </div>
                     <div class="post-actions">
-                        <button class="like-btn">like</button>
+                        <form method="POST" style="display:inline;">
+                            <input type="hidden" name="like_post_id" value="<?php echo $post['postID']; ?>">
+                            <button type="submit" class="like-btn">
+                                <?php echo !empty($userLiked[$post['postID']]) ? 'Unlike' : 'Like'; ?>
+                            </button>
+                        </form>
+                        <span class="like-count" style="margin-left:8px; color:#9ba0a8;">
+                            <?php echo isset($likesCount[$post['postID']]) ? $likesCount[$post['postID']] : 0; ?>
+                        </span>
                         <button class="comment-btn">comment</button>
                     </div>
                 </div>
