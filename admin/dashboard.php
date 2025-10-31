@@ -114,7 +114,7 @@ $recent_users = $recent_users_result ? mysqli_fetch_all($recent_users_result, MY
         </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+    <div class="stat-table" >
         <div class="card">
             <h3>Recent Posts</h3>
             <table class="table">

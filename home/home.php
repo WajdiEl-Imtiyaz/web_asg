@@ -319,7 +319,7 @@ try {
 
     <div class="container">
         <div class="left-sidebar">
-            <h2>Logo</h2>
+            <div class="comet-sphere-title">Comet Sphere</div>
             <nav class="menu">
                 <a href="home.php">Home</a>
                 <a href="">Explore</a>
@@ -491,6 +491,15 @@ try {
                 <button type="submit" id="post-btn" aria-label="Post">Post</button>
             </form>
         </main>
+
+        <div class="bottom-sidebar">
+            <nav class="menu">
+                <a href="home.php">Home</a>
+                <a href="profile.php">Profile</a>
+                <a href="?logout=1" class="logout">Logout</a>
+            </nav>
+            
+        </div>
 
         <div class="right-sidebar">
             <input type="search" id="search" placeholder="Search..." />

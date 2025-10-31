@@ -261,6 +261,16 @@
   }
 }
 
+.comet-sphere-title {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #4ca9c2;
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px rgba(76, 169, 194, 0.5);
+  letter-spacing: 1px;
+}
+
 @media (max-width: 480px) {
   .profile-header {
     padding: 15px;
@@ -273,6 +283,36 @@
   .edit-profile-btn {
     width: 100%;
     max-width: 200px;
+  }
+
+  .left-sidebar,
+  .right-sidebar {
+    display: none;
+  }
+
+  main {
+    margin: 0;
+    width: 100%;
+  }
+
+  .user-post-input-container {
+    left: 20px;
+    right: 20px;
+    bottom: 80px;
+    width: auto;
+  }
+
+  .bottom-sidebar {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    background-color: #1c2433;
+    width: 100vw;
+  }
+
+  .menu {
+    display: flex;
+    justify-content: space-between;
   }
 }
 
