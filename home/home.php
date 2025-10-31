@@ -3,6 +3,47 @@
     session_start();
     require '../db.php';    
 
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['CONTENT_TYPE']) && $_SERVER['CONTENT_TYPE'] === 'application/json') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        if ($data && isset($data['postId']) && isset($data['action'])) {
+            $postId = $data['postId'];
+            $action = $data['action'];
+            
+            $email = $_SESSION['user'];
+            $stmt = $conn->prepare("SELECT uID FROM users WHERE uEmail = ?");
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $user = $stmt->get_result()->fetch_assoc();
+            $uID = $user['uID'];
+            
+            if ($action === 'like') {
+                $check = $conn->prepare("SELECT * FROM likes WHERE postID = ? AND uID = ?");
+                $check->bind_param("ii", $postId, $uID);
+                $check->execute();
+                
+                if ($check->get_result()->num_rows === 0) {
+                    $stmt = $conn->prepare("INSERT INTO likes (postID, uID) VALUES (?, ?)");
+                    $stmt->bind_param("ii", $postId, $uID);
+                    $stmt->execute();
+                }
+            } else if ($action === 'unlike') {
+                $stmt = $conn->prepare("DELETE FROM likes WHERE postID = ? AND uID = ?");
+                $stmt->bind_param("ii", $postId, $uID);
+                $stmt->execute();
+            }
+            
+            $stmt = $conn->prepare("SELECT COUNT(*) as count FROM likes WHERE postID = ?");
+            $stmt->bind_param("i", $postId);
+            $stmt->execute();
+            $count = $stmt->get_result()->fetch_assoc()['count'];
+            
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true, 'likeCount' => $count]);
+            exit();
+        }
+    }
+
     if (isset($_GET['logout'])) {
         $_SESSION = array();
         if (ini_get("session.use_cookies")) {
@@ -82,6 +123,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <link rel="stylesheet" href="home.css" />
+    <script>
+        function toggleLike(button) {
+            const postId = button.getAttribute('data-post-id');
+            const likeIcon = button.querySelector('.like-icon');
+            const likeCount = button.querySelector('.like-count');
+            const isLiked = button.classList.contains('liked');
+
+            fetch('home.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    postId: postId,
+                    action: isLiked ? 'unlike' : 'like'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    button.classList.toggle('liked');
+                    likeIcon.textContent = isLiked ? 'like' : 'unlike';
+                    likeCount.textContent = data.likeCount;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
   </head>
   <body>
     
@@ -119,7 +188,21 @@
         <hr id="header-separator">
 
         <div class="post-card-list">
-            <?php foreach($posts as $post): ?>
+            <?php foreach($posts as $post): 
+        // Get like count for this post
+        $like_count_sql = "SELECT COUNT(*) as count FROM likes WHERE postID = ?";
+        $stmt = $conn->prepare($like_count_sql);
+        $stmt->bind_param("i", $post['postID']);
+        $stmt->execute();
+        $like_count = $stmt->get_result()->fetch_assoc()['count'];
+
+        // Check if current user has liked this post
+        $is_liked_sql = "SELECT * FROM likes WHERE postID = ? AND uID = ?";
+        $stmt = $conn->prepare($is_liked_sql);
+        $stmt->bind_param("ii", $post['postID'], $uID);
+        $stmt->execute();
+        $is_liked = $stmt->get_result()->num_rows > 0;
+    ?>
                 <div class="post-card">
                     <div class="post-header">
                         <div class="user-avatar">
@@ -149,7 +232,12 @@
                         <?php endif; ?>
                     </div>
                     <div class="post-actions">
-                        <button class="like-btn">like</button>
+                        <button class="like-btn <?php echo $is_liked ? 'liked' : ''; ?>" 
+                                data-post-id="<?php echo $post['postID']; ?>"
+                                onclick="toggleLike(this)">
+                            <span class="like-icon"><?php echo $is_liked ? 'unlike' : 'like'; ?></span>
+                            <span class="like-count"><?php echo $like_count; ?></span>
+                        </button>
                         <button class="comment-btn">comment</button>
                     </div>
                 </div>
