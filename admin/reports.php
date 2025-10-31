@@ -419,6 +419,15 @@ $posts_per_day = $post_stats['total_posts'] > 0 ? round($post_stats['total_posts
             </div>
         </div>
     </div>
+
+    <div class="card">
+        <h3>Quick Actions</h3>
+        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+            <a href="manage_users.php" class="edit-btn">Manage Users</a>
+            <a href="manage_posts.php" class="edit-btn">Manage Posts</a>
+            <a href="reports.php" class="edit-btn">View Reports</a>
+        </div>
+    </div>
   </main>
 </div>
     
