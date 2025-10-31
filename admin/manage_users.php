@@ -47,7 +47,6 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
     exit();
 }
 
-// Modified query to use a derived table for latest profiles
 $sql = "SELECT u.uId, u.uEmail, u.is_admin, u.is_banned, u.created_at,
                COALESCE(latest_profile.name, u.uEmail) as display_name 
         FROM users u 

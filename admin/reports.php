@@ -13,14 +13,11 @@ if(isset($_GET['logout'])){
     exit();
 }
 
-// Get date range from URL parameters or default to last 30 days
 $start_date = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-d', strtotime('-30 days'));
 $end_date = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
 
-// Ensure end date includes the entire day by adding time
 $end_date_with_time = $end_date . ' 23:59:59';
 
-// User Statistics - Count only users created within the date range
 $sql = "SELECT 
         COUNT(CASE WHEN created_at BETWEEN ? AND ? THEN 1 END) as total_users,
         COUNT(CASE WHEN is_banned = 1 AND created_at BETWEEN ? AND ? THEN 1 END) as banned_users,
@@ -37,7 +34,6 @@ mysqli_stmt_bind_param($stmt, "ssssssss",
 mysqli_stmt_execute($stmt);
 $user_stats = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 
-// Post Statistics - Count only posts created within the date range
 $sql = "SELECT 
         COUNT(CASE WHEN createdAt BETWEEN ? AND ? THEN 1 END) as total_posts,
         COUNT(CASE WHEN is_archived = 1 AND createdAt BETWEEN ? AND ? THEN 1 END) as archived_posts,
@@ -54,7 +50,6 @@ mysqli_stmt_bind_param($stmt, "ssssssss",
 mysqli_stmt_execute($stmt);
 $post_stats = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 
-// Most Active Users (by post count) - Only count posts within date range
 $sql = "SELECT u.uId, COALESCE(up.name, u.uEmail) as display_name, 
         COUNT(p.postID) as post_count
         FROM users u 
@@ -71,7 +66,6 @@ mysqli_stmt_bind_param($stmt, "ssss", $start_date, $end_date_with_time, $start_d
 mysqli_stmt_execute($stmt);
 $active_users = mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC);
 
-// Recent Activity - Only show activity within date range
 $sql = "SELECT 'user' as type, uId as id, uEmail as name, created_at as date, NULL as content
         FROM users 
         WHERE created_at BETWEEN ? AND ? AND is_admin = 0
@@ -89,18 +83,15 @@ mysqli_stmt_bind_param($stmt, "ssss", $start_date, $end_date_with_time, $start_d
 mysqli_stmt_execute($stmt);
 $recent_activity = mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC);
 
-// Get total platform counts for context (not filtered by date)
 $sql_total_users = "SELECT COUNT(*) as count FROM users";
 $total_users_count = mysqli_fetch_assoc(mysqli_query($conn, $sql_total_users))['count'];
 
 $sql_total_posts = "SELECT COUNT(*) as count FROM posts";
 $total_posts_count = mysqli_fetch_assoc(mysqli_query($conn, $sql_total_posts))['count'];
 
-// Calculate percentages relative to total platform counts
 $new_users_percentage = $total_users_count > 0 ? round(($user_stats['new_users'] / $total_users_count) * 100, 1) : 0;
 $new_posts_percentage = $total_posts_count > 0 ? round(($post_stats['new_posts'] / $total_posts_count) * 100, 1) : 0;
 
-// Calculate period stats
 $period_days = max(1, round((strtotime($end_date) - strtotime($start_date)) / (60 * 60 * 24)) + 1);
 $users_per_day = $user_stats['total_users'] > 0 ? round($user_stats['total_users'] / $period_days, 1) : 0;
 $posts_per_day = $post_stats['total_posts'] > 0 ? round($post_stats['total_posts'] / $period_days, 1) : 0;
@@ -253,7 +244,6 @@ $posts_per_day = $post_stats['total_posts'] > 0 ? round($post_stats['total_posts
   <main>
     <h1>Period Analytics Report</h1>
     
-    <!-- Date Information -->
     <div class="date-info">
         <h3>Report Period: <?php echo date('F j, Y', strtotime($start_date)); ?> to <?php echo date('F j, Y', strtotime($end_date)); ?></h3>
         <div class="date-range">
@@ -264,7 +254,6 @@ $posts_per_day = $post_stats['total_posts'] > 0 ? round($post_stats['total_posts
         </div>
     </div>
     
-    <!-- Date Filter -->
     <div class="card date-filter">
         <form method="GET" style="display: flex; gap: 15px; align-items: end; flex-wrap: wrap; padding: 20px;">
             <label style="display: flex; flex-direction: column; color: #b2b5be; font-size: 14px; min-width: 150px;">
@@ -288,7 +277,6 @@ $posts_per_day = $post_stats['total_posts'] > 0 ? round($post_stats['total_posts
         </form>
     </div>
 
-    <!-- Statistics Overview -->
     <div class="stats">
         <div class="stat">
             <div class="label">Users in Period</div>
@@ -327,7 +315,6 @@ $posts_per_day = $post_stats['total_posts'] > 0 ? round($post_stats['total_posts
     </div>
 
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
-        <!-- Most Active Users -->
         <div class="card">
             <h3>Most Active Users (This Period)</h3>
             <div style="padding: 20px;">
@@ -357,7 +344,6 @@ $posts_per_day = $post_stats['total_posts'] > 0 ? round($post_stats['total_posts
             </div>
         </div>
 
-        <!-- Recent Activity -->
         <div class="card">
             <h3>Recent Activity (This Period)</h3>
             <div style="max-height: 400px; overflow-y: auto;">
@@ -381,7 +367,6 @@ $posts_per_day = $post_stats['total_posts'] > 0 ? round($post_stats['total_posts
         </div>
     </div>
 
-    <!-- Summary -->
     <div class="card" style="margin-top: 25px;">
         <h3>Period Summary</h3>
         <div style="padding: 20px;">

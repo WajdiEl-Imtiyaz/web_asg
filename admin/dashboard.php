@@ -37,7 +37,6 @@ $sql = "SELECT COUNT(DISTINCT postID) as archived_posts FROM posts WHERE is_arch
 $result = mysqli_query($conn, $sql);
 $archived_posts = mysqli_fetch_assoc($result)['archived_posts'];
 
-// Fixed query for recent posts
 $sql = "SELECT p.postID, p.content, p.createdAt, 
                COALESCE(up.name, u.uEmail) as author_name 
         FROM posts p 
@@ -51,7 +50,6 @@ $sql = "SELECT p.postID, p.content, p.createdAt,
 $recent_posts_result = mysqli_query($conn, $sql);
 $recent_posts = $recent_posts_result ? mysqli_fetch_all($recent_posts_result, MYSQLI_ASSOC) : [];
 
-// Fixed query for recent users
 $sql = "SELECT u.uId, u.uEmail, u.created_at, 
                COALESCE(up.name, u.uEmail) as display_name 
         FROM users u 

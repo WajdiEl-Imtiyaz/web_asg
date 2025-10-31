@@ -2,13 +2,11 @@
 session_start();
 require '../db.php';    
 
-// Function to get correct avatar path
 function getAvatarPath($avatar) {
     if (empty($avatar)) {
         return '';
     }
     
-    // If avatar path doesn't start with ../, add it
     if (strpos($avatar, '../') !== 0) {
         return '../' . $avatar;
     }
@@ -23,14 +21,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['CONTENT_TYPE']) && 
         $postId = $data['postId'];
         $email = $_SESSION['user'];
         
-        // Get user ID first as it's needed for both likes and comments
         $stmt = $conn->prepare("SELECT uID FROM users WHERE uEmail = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $user = $stmt->get_result()->fetch_assoc();
         $uID = $user['uID'];
         
-        // Handle comments
         if (isset($data['action']) && $data['action'] === 'addComment' && isset($data['comment'])) {
             $comment = $data['comment'];
             
@@ -38,7 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['CONTENT_TYPE']) && 
             $stmt->bind_param("iis", $postId, $uID, $comment);
             $stmt->execute();
             
-            // Fetch the new comment with user info
             $stmt = $conn->prepare("
                 SELECT c.*, up.name, up.avatar 
                 FROM comments c 
@@ -48,7 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['CONTENT_TYPE']) && 
             $stmt->execute();
             $newComment = $stmt->get_result()->fetch_assoc();
             
-            // Format the timestamp
             $date = new DateTime($newComment['createdAt']);
             $now = new DateTime();
             $interval = $now->diff($date);
@@ -72,7 +66,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['CONTENT_TYPE']) && 
             ]);
             exit();
         }
-        // Handle likes
         elseif (isset($data['action']) && ($data['action'] === 'like' || $data['action'] === 'unlike')) {
             $action = $data['action'];
             
@@ -140,7 +133,6 @@ $stmt->execute();
 $result = $stmt->get_result();
 $userProfile = $result->fetch_assoc();
 
-// Fix current user's avatar path
 if (!empty($userProfile['avatar'])) {
     $userProfile['avatar'] = getAvatarPath($userProfile['avatar']);
 }
@@ -157,13 +149,11 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param("isi", $uID, $name, $age);
         if($stmt->execute()) {
             $showPopup = false;
-            // Refresh user profile data
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("i", $uID);
             $stmt->execute();
             $result = $stmt->get_result();
             $userProfile = $result->fetch_assoc();
-            // Fix avatar path for refreshed data
             if (!empty($userProfile['avatar'])) {
                 $userProfile['avatar'] = getAvatarPath($userProfile['avatar']);
             }
@@ -181,7 +171,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Initialize $posts as empty array to prevent undefined variable error
 $posts = [];
 
 try {
@@ -199,12 +188,10 @@ try {
     if ($posts_result) {
         $posts = $posts_result->fetch_all(MYSQLI_ASSOC);
     } else {
-        // Handle query error
         error_log("Posts query failed: " . $conn->error);
         $posts = [];
     }
 } catch (Exception $e) {
-    // Handle any exceptions
     error_log("Error fetching posts: " . $e->getMessage());
     $posts = [];
 }
@@ -336,7 +323,6 @@ try {
             <div class="post-card-list">
                 <?php if (!empty($posts)): ?>
                     <?php foreach($posts as $post): 
-                        // Get like count for this post
                         $like_count_sql = "SELECT COUNT(*) as count FROM likes WHERE postID = ?";
                         $stmt = $conn->prepare($like_count_sql);
                         $stmt->bind_param("i", $post['postID']);
@@ -344,7 +330,6 @@ try {
                         $like_count_result = $stmt->get_result();
                         $like_count = $like_count_result ? $like_count_result->fetch_assoc()['count'] : 0;
 
-                        // Check if current user has liked this post
                         $is_liked_sql = "SELECT * FROM likes WHERE postID = ? AND uID = ?";
                         $stmt = $conn->prepare($is_liked_sql);
                         $stmt->bind_param("ii", $post['postID'], $uID);
@@ -400,7 +385,6 @@ try {
                             <div id="comment-section-<?php echo $post['postID']; ?>" class="comment-section" style="display: none;">
                                 <div class="comment-list">
                                     <?php
-                                        // Get comments for this post
                                         $comments_sql = "
                                             SELECT c.*, up.name, up.avatar 
                                             FROM comments c 

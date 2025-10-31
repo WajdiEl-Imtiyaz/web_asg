@@ -8,13 +8,12 @@ body {
   min-height: 100vh;
 }
 
-/* Sidebar adjustments */
 .left-sidebar {
   width: 260px;
   position: fixed;
-  top: 0; /* was 56px or var(--topbar-height) */
+  top: 0;
   left: 0;
-  height: 100vh; /* full height */
+  height: 100vh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -27,7 +26,7 @@ main {
   flex: 1;
   margin-left: 260px;
   padding: 0 24px 24px;
-  min-height: 100vh; /* was calc(100vh - 56px) */
+  min-height: 100vh;
   margin-right: 320px;
   box-sizing: border-box;
 }
@@ -35,9 +34,9 @@ main {
 .right-sidebar {
   width: 320px;
   position: fixed;
-  top: 0; /* was 56px or var(--topbar-height) */
+  top: 0;
   right: 0;
-  height: 100vh; /* full height */
+  height: 100vh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -47,7 +46,6 @@ main {
   display: none;
 }
 
-/* Layout Container */
 .container {
   display: flex;
   min-height: 100vh;
@@ -61,15 +59,15 @@ main {
   border-radius: 6px;
   margin-bottom: 8px;
   transition: all 0.2s ease-in-out;
-  border: 2px solid transparent; /* Add transparent border by default */
+  border: 2px solid transparent;
 }
 
 .menu a:hover {
   background: rgba(255, 255, 255, 0.1);
   transform: translateX(5px);
   color: #4ca9c2;
-  border: 2px solid #4ca9c2; /* Add border on hover */
-  box-shadow: 0 0 10px rgba(76, 169, 194, 0.2); /* Optional: adds subtle glow */
+  border: 2px solid #4ca9c2;
+  box-shadow: 0 0 10px rgba(76, 169, 194, 0.2);
 }
 
 .left-sidebar .logout {
@@ -221,7 +219,6 @@ main {
   color: #4ca9c2;
 }
 
-/* Comment section styles */
 .comment-input-container {
   display: flex;
   align-items: center;
@@ -371,7 +368,6 @@ main {
   background: #d16900;
 }
 
-/* Additional CSS for avatar fixes */
 .user-avatar,
 .comment-avatar,
 #home-avatar {

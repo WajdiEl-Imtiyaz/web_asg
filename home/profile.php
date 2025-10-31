@@ -2,13 +2,11 @@
 session_start();
 require '../db.php';
 
-// Function to get correct avatar path
 function getAvatarPath($avatar) {
     if (empty($avatar)) {
         return '';
     }
     
-    // If avatar path doesn't start with ../, add it
     if (strpos($avatar, '../') !== 0) {
         return '../' . $avatar;
     }
@@ -52,7 +50,6 @@ $stmt->execute();
 $result = $stmt->get_result();
 $userProfile = $result->fetch_assoc();
 
-// Fix current user's avatar path
 if (!empty($userProfile['avatar'])) {
     $userProfile['avatar'] = getAvatarPath($userProfile['avatar']);
 }
@@ -70,7 +67,6 @@ if($result->num_rows === 0) {
     $result = $stmt->get_result();
     $userProfile = $result->fetch_assoc();
     
-    // Fix avatar path for new profile
     if (!empty($userProfile['avatar'])) {
         $userProfile['avatar'] = getAvatarPath($userProfile['avatar']);
     }
@@ -118,7 +114,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         $result = $stmt->get_result();
         $userProfile = $result->fetch_assoc();
         
-        // Fix avatar path after update
         if (!empty($userProfile['avatar'])) {
             $userProfile['avatar'] = getAvatarPath($userProfile['avatar']);
         }
@@ -336,7 +331,6 @@ $post_count = count($user_posts);
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    // If it's a default avatar div, replace with img
                     if (preview.classList.contains('default-avatar')) {
                         const newImg = document.createElement('img');
                         newImg.src = e.target.result;
@@ -345,7 +339,6 @@ $post_count = count($user_posts);
                         newImg.id = 'avatarPreview';
                         preview.parentNode.replaceChild(newImg, preview);
                     } else {
-                        // If it's already an img, just update src
                         preview.src = e.target.result;
                     }
                 }

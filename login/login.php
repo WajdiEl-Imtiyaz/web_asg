@@ -2,7 +2,6 @@
     session_start();
     require '../db.php';
     
-    // Clear form data if coming from back button
     header("Cache-Control: no-cache, no-store, must-revalidate");
     header("Pragma: no-cache");
     header("Expires: 0");
@@ -20,7 +19,6 @@
             $result = mysqli_stmt_get_result($stmt);
 
         if($row = mysqli_fetch_assoc($result)){
-            // Check if user is banned
             if ($row['is_banned']) {
                 $error = "This account has been banned. Please contact administrator.";
             } else if (password_verify($password, $row['uPassword'])) {
@@ -46,7 +44,6 @@
         $confirm = $_POST['confirm'];
         
         if($password === $confirm){
-            // Check if email already exists
             $check_sql = "SELECT uEmail FROM users WHERE uEmail = ?";
             $check_stmt = mysqli_prepare($conn, $check_sql);
             mysqli_stmt_bind_param($check_stmt, "s", $email);
@@ -56,7 +53,6 @@
             if(mysqli_num_rows($check_result) > 0){
                 $error = "Email address already registered. Please use a different email.";
             } else {
-                // Hash password before storing
                 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
                 
                 $sql = "INSERT INTO users (uEmail, uPassword) VALUES (?, ?)";
@@ -128,17 +124,14 @@
         }
     </style>
     <script>
-        // Prevent form resubmission on page refresh/back
         if (window.history.replaceState) {
             window.history.replaceState(null, null, window.location.href);
         }
         
-        // Clear form on page load
         window.addEventListener('load', function() {
             document.getElementById('login-form').reset();
         });
 
-        // Handle back/forward navigation
         window.addEventListener('pageshow', function(event) {
             if (event.persisted) {
                 document.getElementById('login-form').reset();
@@ -151,7 +144,6 @@
     <div class="comet-sphere-title">Comet Sphere</div>
     
     <form method="POST" id="login-form">
-        <!-- Login/Sign Up buttons inside the form -->
         <div id="login-dir-btn">
             <button type="button" id="show-login-btn" class="active">Log in</button>
             <button type="button" id="show-signup-btn">Sign up</button>
@@ -170,7 +162,6 @@
             <input type="password" id="confirm" name="confirm">
         </div>
         
-        <!-- Only show one submit button at a time -->
         <input type="submit" name="action" id="login-btn" value="Login" style="display: block;">
         <input type="submit" name="action" id="signup-btn" value="Sign Up" style="display: none;">
         

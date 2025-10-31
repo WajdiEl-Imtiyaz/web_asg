@@ -46,7 +46,6 @@ if(isset($_GET['action']) && isset($_GET['id'])) {
     }
 }
 
-// Modified query to use a derived table for latest profiles
 $sql = "SELECT p.postID, p.content, p.image, p.createdAt, p.is_archived,
                u.uEmail, u.uId,
                COALESCE(latest_profile.name, u.uEmail) as display_name 
