@@ -48,15 +48,12 @@ if(isset($_GET['action']) && isset($_GET['id'])) {
 
 // Modified query to prevent duplicates - get only the latest profile for each user
 $sql = "SELECT p.postID, p.content, p.image, p.createdAt, p.is_archived,
-               u.uEmail, u.uId,
-               COALESCE(up.name, u.uEmail) as display_name 
-        FROM posts p 
-        JOIN users u ON p.uID = u.uId 
-        LEFT JOIN user_profile up ON (p.uID = up.uID AND up.profileID = (
-            SELECT MAX(profileID) FROM user_profile up2 WHERE up2.uID = p.uID
-        ))
-        GROUP BY p.postID
-        ORDER BY p.createdAt DESC";
+           u.uEmail, u.uId,
+           COALESCE(up.name, u.uEmail) as display_name 
+    FROM posts p 
+    JOIN users u ON p.uID = u.uId 
+    LEFT JOIN user_profile up ON p.uID = up.uID 
+    ORDER BY p.createdAt DESC";
 $result = mysqli_query($conn, $sql);
 $posts = mysqli_fetch_all($result, MYSQLI_ASSOC);
 

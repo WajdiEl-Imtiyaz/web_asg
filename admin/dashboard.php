@@ -41,11 +41,8 @@ $sql = "SELECT p.postID, p.content, p.createdAt,
                COALESCE(up.name, u.uEmail) as author_name 
         FROM posts p 
         JOIN users u ON p.uID = u.uId 
-        LEFT JOIN user_profile up ON (p.uID = up.uID AND up.profileID = (
-            SELECT MAX(profileID) FROM user_profile up2 WHERE up2.uID = p.uID
-        ))
+        LEFT JOIN user_profile up ON p.uID = up.uID 
         WHERE (p.is_archived = FALSE OR p.is_archived IS NULL)
-        GROUP BY p.postID
         ORDER BY p.createdAt DESC 
         LIMIT 10";
 $recent_posts_result = mysqli_query($conn, $sql);
@@ -54,10 +51,7 @@ $recent_posts = mysqli_fetch_all($recent_posts_result, MYSQLI_ASSOC);
 $sql = "SELECT u.uId, u.uEmail, u.created_at, 
                COALESCE(up.name, u.uEmail) as display_name 
         FROM users u 
-        LEFT JOIN user_profile up ON (u.uId = up.uID AND up.profileID = (
-            SELECT MAX(profileID) FROM user_profile up2 WHERE up2.uID = u.uId
-        ))
-        GROUP BY u.uId
+        LEFT JOIN user_profile up ON u.uId = up.uID 
         ORDER BY u.created_at DESC 
         LIMIT 10";
 $recent_users_result = mysqli_query($conn, $sql);

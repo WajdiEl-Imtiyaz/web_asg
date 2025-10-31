@@ -65,13 +65,10 @@
         }
     }
 
-    $posts_query = "SELECT p.postID, p.uID, p.content, p.image, p.createdAt, p.is_archived, up.name, up.avatar 
+    $posts_query = "SELECT p.postID, p.uID, p.content, p.image, p.createdAt, up.name, up.avatar 
                    FROM posts p 
-                   LEFT JOIN user_profile up ON (p.uID = up.uID AND up.profileID = (
-                       SELECT MAX(profileID) FROM user_profile up2 WHERE up2.uID = p.uID
-                   ))
+                   LEFT JOIN user_profile up ON p.uID = up.uID 
                    WHERE p.is_archived = FALSE OR p.is_archived IS NULL
-                   GROUP BY p.postID
                    ORDER BY p.createdAt DESC";
     $posts_result = $conn->query($posts_query);
     $posts = $posts_result->fetch_all(MYSQLI_ASSOC);

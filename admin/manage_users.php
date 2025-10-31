@@ -49,13 +49,10 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
 
 // Modified query to prevent duplicates - get only the latest profile for each user
 $sql = "SELECT u.uId, u.uEmail, u.is_admin, u.is_banned, u.created_at,
-               COALESCE(up.name, u.uEmail) as display_name 
-        FROM users u 
-        LEFT JOIN user_profile up ON (u.uId = up.uID AND up.profileID = (
-            SELECT MAX(profileID) FROM user_profile up2 WHERE up2.uID = u.uId
-        ))
-        GROUP BY u.uId
-        ORDER BY u.created_at DESC";
+           COALESCE(up.name, u.uEmail) as display_name 
+    FROM users u 
+    LEFT JOIN user_profile up ON u.uId = up.uID 
+    ORDER BY u.created_at DESC";
 $result = mysqli_query($conn, $sql);
 $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
