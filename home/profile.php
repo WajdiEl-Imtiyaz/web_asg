@@ -154,7 +154,7 @@ $post_count = count($user_posts);
     
     <div class="container">
         <div class="left-sidebar">
-            <h2>Logo</h2>
+            <div class="comet-sphere-title">Comet Sphere</div>
             <nav class="menu">
                 <a href="home.php">Home</a>
                 <a href="">Explore</a>
@@ -312,6 +312,15 @@ $post_count = count($user_posts);
             </form>
         </div>
     </div>
+
+    <div class="bottom-sidebar">
+            <nav class="menu">
+                <a href="home.php">Home</a>
+                <a href="profile.php">Profile</a>
+                <a href="?logout=1" class="logout">Logout</a>
+            </nav>
+            
+        </div>
 
     <script>
         function openEditModal() {
